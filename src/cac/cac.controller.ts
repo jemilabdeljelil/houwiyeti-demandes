@@ -299,7 +299,7 @@ export class CacController {
         }
         //
         if (!(comparefacResult && OpenCvResult)) {
-            const log = { deviceToken: demandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: demandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 7, uid: demandeTitreDTO.uid, endpoint: 'registerDemandeTitre', position: demandeGeoLocation ,comment:"Une ou les deux API correspondantes ont indiqué qu'il ne s'agissait pas de la même personne", comparefaceMatch: comparefaceMatch, openCvMatch: openCvMatch }
+            const log = { deviceToken: demandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: demandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 7, uid: demandeTitreDTO.uid, endpoint: 'registerDemandeTitre', position: demandeGeoLocation ,comment:"Une ou les deux API correspondantes ont indiqué qu'il ne s'agissait pas de la même personne", comparefaceMatch: JSON.stringify(comparefaceMatch), openCvMatch: JSON.stringify(openCvMatch) }
             try {
                 const createdLog = await this.LogeModel.create(log);
                 console.log('Log created:', createdLog);
@@ -313,7 +313,7 @@ export class CacController {
         try {
             orderData = await this.cacService.generateNOrdreP(nniDemande, await this.cacService.convertTypeDoc(TypeDocumentDemande), await this.cacService.convertCodeDemande(codeDemand), 0);
         } catch (error) {
-            const log = { deviceToken: demandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: demandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 6, uid: demandeTitreDTO.uid, operation:"Genrate_Order", endpoint: 'registerDemandeTitre', position: demandeGeoLocation,comment:"Erreur l'ord de generation de l'ordre", comparefaceMatch: comparefaceMatch, openCvMatch: openCvMatch }
+            const log = { deviceToken: demandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: demandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 6, uid: demandeTitreDTO.uid, operation:"Genrate_Order", endpoint: 'registerDemandeTitre', position: demandeGeoLocation,comment:"Erreur l'ord de generation de l'ordre", comparefaceMatch: JSON.stringify(comparefaceMatch), openCvMatch: JSON.stringify(openCvMatch) }
             try {
                 const createdLog = await this.LogeModel.create(log);
                 console.log('Log created:', createdLog);
@@ -366,7 +366,7 @@ export class CacController {
             await session.commitTransaction();
             session.endSession();
             const retour = { numOrderDeRecette: orderData[0], Montant: orderData[1], demandeStatus: 0, successCode: 2, livresonPin: livraisonPin, NUD: nud, demandeId: newDemande._id };
-            const log = { deviceToken: demandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: demandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), successCode: 2, uid: demandeTitreDTO.uid, endpoint: 'registerDemandeTitre', position: demandeGeoLocation, nudId: newNud._id,comment:"Demande Enregistré avec succés" ,comparefaceMatch: comparefaceMatch, openCvMatch: openCvMatch }
+            const log = { deviceToken: demandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: demandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), successCode: 2, uid: demandeTitreDTO.uid, endpoint: 'registerDemandeTitre', position: demandeGeoLocation, nudId: newNud._id,comment:"Demande Enregistré avec succés" , comparefaceMatch: JSON.stringify(comparefaceMatch), openCvMatch: JSON.stringify(openCvMatch) }
             try {
                 const createdLog = await this.LogeModel.create(log);
                 console.log('Log created:', createdLog);
@@ -382,7 +382,7 @@ export class CacController {
             await session.abortTransaction();
             session.endSession();
 
-            const log = { deviceToken: demandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: demandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 6, uid: demandeTitreDTO.uid, operation:"Enregistremet_du_demandes", endpoint: 'registerDemandeTitre', position: demandeGeoLocation,comment:"Erreur l'ord de l'enregistrement", comparefaceMatch: comparefaceMatch, openCvMatch: openCvMatch }
+            const log = { deviceToken: demandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: demandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 6, uid: demandeTitreDTO.uid, operation:"Enregistremet_du_demandes", endpoint: 'registerDemandeTitre', position: demandeGeoLocation,comment:"Erreur l'ord de l'enregistrement", comparefaceMatch: JSON.stringify(comparefaceMatch), openCvMatch: JSON.stringify(openCvMatch) }
             try {
                 const createdLog = await this.LogeModel.create(log);
                 console.log('Log created:', createdLog);
@@ -604,7 +604,7 @@ export class CacController {
         }
         // les deux api doit matcher le result
         if (!(comparefacResult && OpenCvResult)) {
-            const log = { deviceToken: updateDemandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: updateDemandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 7, uid: updateDemandeTitreDTO.uid, endpoint: 'updateDemandeTitre', position: demandeGeoLocation,comment:"Une ou les deux API correspondantes ont indiqué qu'il ne s'agissait pas de la même personne", comparefaceMatch: comparefaceMatch, openCvMatch: openCvMatch }
+            const log = { deviceToken: updateDemandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: updateDemandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 7, uid: updateDemandeTitreDTO.uid, endpoint: 'updateDemandeTitre', position: demandeGeoLocation,comment:"Une ou les deux API correspondantes ont indiqué qu'il ne s'agissait pas de la même personne", comparefaceMatch: JSON.stringify(comparefaceMatch), openCvMatch: JSON.stringify(openCvMatch) }
             try {
                 const createdLog = await this.LogeModel.create(log);
                 console.log('Log created:', createdLog);
@@ -651,7 +651,7 @@ export class CacController {
             await session.commitTransaction();
             session.endSession();
             const retour = { demandeStatus: 1, successCode: 2, livresonPin: livraisonPin, NUD: nud };
-            const log = { deviceToken: updateDemandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: updateDemandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), successCode: 2, uid: updateDemandeTitreDTO.uid, endpoint: 'updateDemandeTitre', position: demandeGeoLocation, nudId: newNud._id ,comment:"Demande enregistrée avec succès ", comparefaceMatch: comparefaceMatch, openCvMatch: openCvMatch }
+            const log = { deviceToken: updateDemandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: updateDemandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), successCode: 2, uid: updateDemandeTitreDTO.uid, endpoint: 'updateDemandeTitre', position: demandeGeoLocation, nudId: newNud._id ,comment:"Demande enregistrée avec succès ", comparefaceMatch: JSON.stringify(comparefaceMatch), openCvMatch: JSON.stringify(openCvMatch) }
             try {
                 const createdLog = await this.LogeModel.create(log);
                 console.log('Log created:', createdLog);
@@ -667,7 +667,7 @@ export class CacController {
             await session.abortTransaction();
             session.endSession();
 
-            const log = { deviceToken: updateDemandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: updateDemandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 6, uid: updateDemandeTitreDTO.uid, endpoint: 'updateDemandeTitre', demandeGeoLocation: location ,comment:"Erreur l'ord de l'enregistrement de la demande  ", comparefaceMatch: comparefaceMatch, openCvMatch: openCvMatch }
+            const log = { deviceToken: updateDemandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: updateDemandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 6, uid: updateDemandeTitreDTO.uid, endpoint: 'updateDemandeTitre', demandeGeoLocation: location ,comment:"Erreur l'ord de l'enregistrement de la demande  ", comparefaceMatch: JSON.stringify(comparefaceMatch), openCvMatch: JSON.stringify(openCvMatch)}
             try {
                 const createdLog = await this.LogeModel.create(log);
                 console.log('Log created:', createdLog);
