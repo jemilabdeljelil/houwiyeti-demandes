@@ -106,7 +106,7 @@ export class CacController {
 
         //ckeck if exste demande en cours
         if (await this.cacService.existDemendeEncours(nniDemande, TypeDocumentDemande)) {
-            const log = { deviceToken: demandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: demandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 9, uid: demandeTitreDTO.uid, endpoint: 'registerDemandeTitre', position: demandeGeoLocation }
+            const log = { deviceToken: demandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: demandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 9, uid: demandeTitreDTO.uid, endpoint: 'registerDemandeTitre', position: demandeGeoLocation,comment:"Il y a une demande pour la même type en cours" }
             try {
                 const createdLog = await this.LogeModel.create(log);
                 console.log('Log created:', createdLog);
@@ -119,7 +119,7 @@ export class CacController {
         //ckeck if  NNI  Authorized
 
         if (!await this.cacService.IsNniAuthorized(nniMaster, nniDemande, TypeDocumentDemande)) {
-            const log = { deviceToken: demandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: demandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 8, uid: demandeTitreDTO.uid, endpoint: 'registerDemandeTitre', position: demandeGeoLocation }
+            const log = { deviceToken: demandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: demandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 8, uid: demandeTitreDTO.uid, endpoint: 'registerDemandeTitre', position: demandeGeoLocation,codeDemande:codeDemand ,comment:"NNI de la demande est non autorisé " }
             try {
                 const createdLog = await this.LogeModel.create(log);
                 console.log('Log created:', createdLog);
@@ -130,7 +130,7 @@ export class CacController {
         }
 
         if (!await this.cacService.demandeIsAuthorized(nniDemande, codeDemand)) {
-            const log = { deviceToken: demandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: demandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 9, uid: demandeTitreDTO.uid, endpoint: 'registerDemandeTitre', position: demandeGeoLocation }
+            const log = { deviceToken: demandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: demandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 9, uid: demandeTitreDTO.uid, endpoint: 'registerDemandeTitre', position: demandeGeoLocation,codeDemande:codeDemand ,comment:"Demande non autorisée" }
             try {
                 const createdLog = await this.LogeModel.create(log);
                 console.log('Log created:', createdLog);
@@ -142,7 +142,7 @@ export class CacController {
         
         if (livraisonType == 'LAD') {
             if (!await this.cacService.zoneLivraisonExiste(longitude, latitude)) {
-                const log = { deviceToken: demandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: demandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 10, uid: demandeTitreDTO.uid, endpoint: 'registerDemandeTitre', position: demandeGeoLocation }
+                const log = { deviceToken: demandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: demandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 10, uid: demandeTitreDTO.uid, endpoint: 'registerDemandeTitre', position: demandeGeoLocation,comment:"zone non prise en charge à la livraison"  }
                 try {
                     const createdLog = await this.LogeModel.create(log);
                     console.log('Log created:', createdLog);
@@ -155,7 +155,7 @@ export class CacController {
         }
         if (livraisonType == 'CAC') {
             if (!this.cacService.CacExiste) {
-                const log = { deviceToken: demandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: demandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 10, uid: demandeTitreDTO.uid, endpoint: 'registerDemandeTitre', position: demandeGeoLocation }
+                const log = { deviceToken: demandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: demandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 10, uid: demandeTitreDTO.uid, endpoint: 'registerDemandeTitre', position: demandeGeoLocation,comment:"Le centre selectioné n'existe pas " }
                 try {
                     const createdLog = await this.LogeModel.create(log);
                     console.log('Log created:', createdLog);
@@ -182,6 +182,7 @@ export class CacController {
                 operation:"write_icaoFile",
                 endpoint: 'registerDemandeTitre',
                 position: demandeGeoLocation,
+                comment:"Erreur lord de seting imageIcao" 
             };
 
             try {
@@ -221,6 +222,7 @@ export class CacController {
                         operation:"write_PieceJointe",
                         endpoint: 'registerDemandeTitre',
                         position: demandeGeoLocation,
+                        comment:"Erreur lord de seting pieces" 
                     };
 
                     try {
@@ -256,6 +258,7 @@ export class CacController {
                 operation:"get_SigBineryImage",
                 endpoint: 'registerDemandeTitre',
                 position: demandeGeoLocation,
+                comment:"Erreur l'ord de la recuperation de l'image sigpts "
             };
 
             try {
@@ -296,7 +299,7 @@ export class CacController {
         }
         //
         if (!(comparefacResult && OpenCvResult)) {
-            const log = { deviceToken: demandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: demandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 7, uid: demandeTitreDTO.uid, endpoint: 'registerDemandeTitre', position: demandeGeoLocation, comparefaceMatch: comparefaceMatch, openCvMatch: openCvMatch }
+            const log = { deviceToken: demandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: demandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 7, uid: demandeTitreDTO.uid, endpoint: 'registerDemandeTitre', position: demandeGeoLocation ,comment:"Une ou les deux API correspondantes ont indiqué qu'il ne s'agissait pas de la même personne", comparefaceMatch: comparefaceMatch, openCvMatch: openCvMatch }
             try {
                 const createdLog = await this.LogeModel.create(log);
                 console.log('Log created:', createdLog);
@@ -310,7 +313,7 @@ export class CacController {
         try {
             orderData = await this.cacService.generateNOrdreP(nniDemande, await this.cacService.convertTypeDoc(TypeDocumentDemande), await this.cacService.convertCodeDemande(codeDemand), 0);
         } catch (error) {
-            const log = { deviceToken: demandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: demandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 6, uid: demandeTitreDTO.uid, operation:"Genrate_Order", endpoint: 'registerDemandeTitre', position: demandeGeoLocation, comparefaceMatch: comparefaceMatch, openCvMatch: openCvMatch }
+            const log = { deviceToken: demandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: demandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 6, uid: demandeTitreDTO.uid, operation:"Genrate_Order", endpoint: 'registerDemandeTitre', position: demandeGeoLocation,comment:"Erreur l'ord de generation de l'ordre", comparefaceMatch: comparefaceMatch, openCvMatch: openCvMatch }
             try {
                 const createdLog = await this.LogeModel.create(log);
                 console.log('Log created:', createdLog);
@@ -363,7 +366,7 @@ export class CacController {
             await session.commitTransaction();
             session.endSession();
             const retour = { numOrderDeRecette: orderData[0], Montant: orderData[1], demandeStatus: 0, successCode: 2, livresonPin: livraisonPin, NUD: nud, demandeId: newDemande._id };
-            const log = { deviceToken: demandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: demandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), successCode: 2, uid: demandeTitreDTO.uid, endpoint: 'registerDemandeTitre', position: demandeGeoLocation, nudId: newNud._id, comparefaceMatch: comparefaceMatch, openCvMatch: openCvMatch }
+            const log = { deviceToken: demandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: demandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), successCode: 2, uid: demandeTitreDTO.uid, endpoint: 'registerDemandeTitre', position: demandeGeoLocation, nudId: newNud._id,comment:"Demande Enregistré avec succés" ,comparefaceMatch: comparefaceMatch, openCvMatch: openCvMatch }
             try {
                 const createdLog = await this.LogeModel.create(log);
                 console.log('Log created:', createdLog);
@@ -379,7 +382,7 @@ export class CacController {
             await session.abortTransaction();
             session.endSession();
 
-            const log = { deviceToken: demandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: demandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 6, uid: demandeTitreDTO.uid, operation:"Enregistremet_du_demandes", endpoint: 'registerDemandeTitre', position: demandeGeoLocation, comparefaceMatch: comparefaceMatch, openCvMatch: openCvMatch }
+            const log = { deviceToken: demandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: demandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 6, uid: demandeTitreDTO.uid, operation:"Enregistremet_du_demandes", endpoint: 'registerDemandeTitre', position: demandeGeoLocation,comment:"Erreur l'ord de l'enregistrement", comparefaceMatch: comparefaceMatch, openCvMatch: openCvMatch }
             try {
                 const createdLog = await this.LogeModel.create(log);
                 console.log('Log created:', createdLog);
@@ -470,7 +473,7 @@ export class CacController {
             await this.cacService.setImage(photoIcao, photoIcaoName, photosDemandsPath);
         } catch (error) {
             console.error('Error  writing file:', error);
-            const log = { deviceToken: updateDemandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: updateDemandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 6, uid: updateDemandeTitreDTO.uid, endpoint: 'updateDemandeTitre', position: demandeGeoLocation }
+            const log = { deviceToken: updateDemandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: updateDemandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 6, uid: updateDemandeTitreDTO.uid, endpoint: 'updateDemandeTitre', position: demandeGeoLocation,comment:"Erreur lord de seting imageIcao" }
             try {
                 const createdLog = await this.LogeModel.create(log);
                 console.log('Log created:', createdLog);
@@ -500,7 +503,7 @@ export class CacController {
         }
 
         if (this.cacService.existDemendeEncours(nniDemande, TypeDocumentDemande)) {
-            const log = { deviceToken: updateDemandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: updateDemandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 9, uid: updateDemandeTitreDTO.uid, endpoint: 'updateDemandeTitre', position: demandeGeoLocation }
+            const log = { deviceToken: updateDemandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: updateDemandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 9, uid: updateDemandeTitreDTO.uid, endpoint: 'updateDemandeTitre', position: demandeGeoLocation ,comment:"Il y a une demande pour la même type en cours"}
             try {
                 const createdLog = await this.LogeModel.create(log);
                 console.log('Log created:', createdLog);
@@ -511,7 +514,7 @@ export class CacController {
         }
 
         if (!await this.cacService.IsNniAuthorized(nniMaster, nniDemande, TypeDocumentDemande)) {
-            const log = { deviceToken: updateDemandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: updateDemandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 8, uid: updateDemandeTitreDTO.uid, endpoint: 'updateDemandeTitre', position: demandeGeoLocation }
+            const log = { deviceToken: updateDemandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: updateDemandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 8, uid: updateDemandeTitreDTO.uid, endpoint: 'updateDemandeTitre', position: demandeGeoLocation,codeDemande:codeDemand ,comment:"NNI de la demande est non autorisé " }
             try {
                 const createdLog = await this.LogeModel.create(log);
                 console.log('Log created:', createdLog);
@@ -522,7 +525,7 @@ export class CacController {
         }
 
         if (! await this.cacService.demandeIsAuthorized(nniDemande, codeDemand)) {
-            const log = { deviceToken: updateDemandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: updateDemandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 9, uid: updateDemandeTitreDTO.uid, endpoint: 'updateDemandeTitre', position: demandeGeoLocation }
+            const log = { deviceToken: updateDemandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: updateDemandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 9, uid: updateDemandeTitreDTO.uid, endpoint: 'updateDemandeTitre', position: demandeGeoLocation,codeDemande:codeDemand ,comment:"Demande non autorisée"}
             try {
                 const createdLog = await this.LogeModel.create(log);
                 console.log('Log created:', createdLog);
@@ -533,7 +536,7 @@ export class CacController {
         }
         if (livraisonType == 'LAD') {
             if (!this.cacService.zoneLivraisonExiste(longitude, latitude)) {
-                const log = { deviceToken: updateDemandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: updateDemandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 10, uid: updateDemandeTitreDTO.uid, endpoint: 'updateDemandeTitre', position: demandeGeoLocation }
+                const log = { deviceToken: updateDemandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: updateDemandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 10, uid: updateDemandeTitreDTO.uid, endpoint: 'updateDemandeTitre', position: demandeGeoLocation,comment:"zone non prise en charge à la livraison" }
                 try {
                     const createdLog = await this.LogeModel.create(log);
                     console.log('Log created:', createdLog);
@@ -546,7 +549,7 @@ export class CacController {
         }
         if (livraisonType == 'CAC') {
             if (!this.cacService.CacExiste) {
-                const log = { deviceToken: updateDemandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: updateDemandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 10, uid: updateDemandeTitreDTO.uid, endpoint: 'updateDemandeTitre', position: demandeGeoLocation }
+                const log = { deviceToken: updateDemandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: updateDemandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 10, uid: updateDemandeTitreDTO.uid, endpoint: 'updateDemandeTitre', position: demandeGeoLocation,comment:"Le centre selectioné n'existe pas " }
                 try {
                     const createdLog = await this.LogeModel.create(log);
                     console.log('Log created:', createdLog);
@@ -566,7 +569,7 @@ export class CacController {
             // photoSig = fs.readFile(photoSigPath);
             photoSig = await this.cacService.getBinaryImage(photoSigName, photosSigptsPath);
         } catch (error) {
-            const log = { deviceToken: updateDemandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: updateDemandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 6, uid: updateDemandeTitreDTO.uid, endpoint: 'updateDemandeTitre', position: demandeGeoLocation }
+            const log = { deviceToken: updateDemandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: updateDemandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 6, uid: updateDemandeTitreDTO.uid, endpoint: 'updateDemandeTitre', position: demandeGeoLocation,comment:"Erreur l'ord de la recuperation de l'image sigpts " }
             try {
                 const createdLog = await this.LogeModel.create(log);
                 console.log('Log created:', createdLog);
@@ -601,7 +604,7 @@ export class CacController {
         }
         // les deux api doit matcher le result
         if (!(comparefacResult && OpenCvResult)) {
-            const log = { deviceToken: updateDemandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: updateDemandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 7, uid: updateDemandeTitreDTO.uid, endpoint: 'updateDemandeTitre', position: demandeGeoLocation, comparefaceMatch: comparefaceMatch, openCvMatch: openCvMatch }
+            const log = { deviceToken: updateDemandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: updateDemandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 7, uid: updateDemandeTitreDTO.uid, endpoint: 'updateDemandeTitre', position: demandeGeoLocation,comment:"Une ou les deux API correspondantes ont indiqué qu'il ne s'agissait pas de la même personne", comparefaceMatch: comparefaceMatch, openCvMatch: openCvMatch }
             try {
                 const createdLog = await this.LogeModel.create(log);
                 console.log('Log created:', createdLog);
@@ -648,7 +651,7 @@ export class CacController {
             await session.commitTransaction();
             session.endSession();
             const retour = { demandeStatus: 1, successCode: 2, livresonPin: livraisonPin, NUD: nud };
-            const log = { deviceToken: updateDemandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: updateDemandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), successCode: 2, uid: updateDemandeTitreDTO.uid, endpoint: 'updateDemandeTitre', position: demandeGeoLocation, nudId: newNud._id, comparefaceMatch: comparefaceMatch, openCvMatch: openCvMatch }
+            const log = { deviceToken: updateDemandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: updateDemandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), successCode: 2, uid: updateDemandeTitreDTO.uid, endpoint: 'updateDemandeTitre', position: demandeGeoLocation, nudId: newNud._id ,comment:"Demande enregistrée avec succès ", comparefaceMatch: comparefaceMatch, openCvMatch: openCvMatch }
             try {
                 const createdLog = await this.LogeModel.create(log);
                 console.log('Log created:', createdLog);
@@ -664,7 +667,7 @@ export class CacController {
             await session.abortTransaction();
             session.endSession();
 
-            const log = { deviceToken: updateDemandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: updateDemandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 6, uid: updateDemandeTitreDTO.uid, endpoint: 'updateDemandeTitre', demandeGeoLocation: location, comparefaceMatch: comparefaceMatch, openCvMatch: openCvMatch }
+            const log = { deviceToken: updateDemandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: updateDemandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 6, uid: updateDemandeTitreDTO.uid, endpoint: 'updateDemandeTitre', demandeGeoLocation: location ,comment:"Erreur l'ord de l'enregistrement de la demande  ", comparefaceMatch: comparefaceMatch, openCvMatch: openCvMatch }
             try {
                 const createdLog = await this.LogeModel.create(log);
                 console.log('Log created:', createdLog);
@@ -704,7 +707,7 @@ export class CacController {
             return new MessageDTO('errorCode', 17);
         }
         if (!this.cacService.zoneLivraisonExiste(longitude, latitude)) {
-            const log = { deviceToken: demandeExtraitsDTO.deviceToken, nni: nniMaster, phoneNumber: demandeExtraitsDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 10, uid: demandeExtraitsDTO.uid, endpoint: 'registerDemandeExtraits', position: demandeExtraitsDTO.location }
+            const log = { deviceToken: demandeExtraitsDTO.deviceToken, nni: nniMaster, phoneNumber: demandeExtraitsDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 10, uid: demandeExtraitsDTO.uid, endpoint: 'registerDemandeExtraits', position: demandeExtraitsDTO.location,comment:"zone non prise en charge à la livraison" }
             try {
                 const createdLog = await this.LogeModel.create(log);
                 console.log('Log created:', createdLog);
@@ -719,7 +722,7 @@ export class CacController {
         try {
             orderData = await this.cacService.generateNOrdreP(nniMaster, 10, 1, totalExtrait);
         } catch (error) {
-            const log = { deviceToken: demandeExtraitsDTO.deviceToken, nni: nniMaster, phoneNumber: demandeExtraitsDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 6, uid: demandeExtraitsDTO.uid, endpoint: 'registerDemandeExtraits', position: demandeExtraitsDTO.location }
+            const log = { deviceToken: demandeExtraitsDTO.deviceToken, nni: nniMaster, phoneNumber: demandeExtraitsDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 6, uid: demandeExtraitsDTO.uid, endpoint: 'registerDemandeExtraits', position: demandeExtraitsDTO.location,comment:"Erreur l'ord de generation de l'ordre" }
             try {
                 const createdLog = await this.LogeModel.create(log);
                 console.log('Log created:', createdLog);

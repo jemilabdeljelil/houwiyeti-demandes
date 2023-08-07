@@ -526,19 +526,23 @@ export class CacService {
   //get binery image from http url
   async getBinaryImage(imageName: string, imageDirectory: string): Promise<Buffer> {
     const url = (await this.ParamsModel.findOne({ key: "getBinaryImageUrl" }).exec()).value;
+    try {
+      const response = await axios.get(`${url}/${imageName}/${imageDirectory}`, { responseType: 'arraybuffer' });
+      console.log("sigpts image geted  successfully");
+      return Buffer.from(response.data, 'binary');
 
-    const response = await axios.get(`${url}/${imageName}/${imageDirectory}`, { responseType: 'arraybuffer' });
-
-    return Buffer.from(response.data, 'binary');
+    } catch (error) {
+      console.error('Error geting image:', error.response.data);
+    }
   }
 
   async annulerDemande(nud: string): Promise<boolean> {
     if (!nud || !nud.startsWith('555')) {
-      return false; 
+      return false;
     }
-  
+
     const nudSigpt = await this.NudSigptModel.updateOne(
-      {nud:nud,demandeStatus:0},
+      { nud: nud, demandeStatus: 0 },
       {
         demandeStatus: 6,
         commentaire: "Cette demande a été annulée par son émetteur"
@@ -548,12 +552,12 @@ export class CacService {
         runValidators: true, // Validate the update operation against the model's schema
         upsert: false // Do not create a new document if not found
       }
-    ); 
-  
-    if (nudSigpt.modifiedCount==0) {
-        return false;
+    );
+
+    if (nudSigpt.modifiedCount == 0) {
+      return false;
     }
-  
+
     return true;
   }
 }

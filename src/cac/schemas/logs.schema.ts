@@ -54,6 +54,14 @@ export class Log extends Document {
     coordinates: { type: [Number], required: true },
   })
   position: Location;
+  @Prop()
+  codeDemande:string; 
+  @Prop()
+  comment:string; 
+  @Prop()
+  comparefaceMatch :string;
+  @Prop()
+  openCvMatch :string;
 }
 
 export const LogSchema = SchemaFactory.createForClass(Log);
