@@ -248,14 +248,14 @@ export class CacService {
 
 
   // demende est autorisé
-  async demandeIsAuthorized(nni: string, codeDemand: string): Promise<boolean> {
+  async demandeIsAuthorized(nni: string, codeDemand: string,typeDocumentDemande: string): Promise<boolean> {
     const titre = await this.TitreModel.findOne({
       nni,
-      typeTitre: codeDemand,
+      typeTitre: typeDocumentDemande,
       expiryDT: { $gte: new Date() }, // filter out expired titres
     }).sort({ expiryDT: -1 }).exec(); // sort by descending expiry date
     // delai avant expiration en ms
-    const delaiAvantExpirationMs = Number((await this.getParams()).get('delaiAvantExpiration')) * 86400000;
+    const delaiAvantExpirationMs = Number((await this.getParams()).get('delaiAvantExpiration_NP')) * 86400000;
 
 
     if (codeDemand === 'RN') {

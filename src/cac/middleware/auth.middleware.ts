@@ -25,15 +25,15 @@ export class AuthMiddleware implements NestMiddleware {
       // Check auth token and extract UID authTOken from herader
       //const authToken = authorization?.split(' ')[1];
       if (authToken) {
-        const decodedToken = await admin.auth().verifyIdToken(authToken);
-        req.body.uid = decodedToken.uid;
+       const decodedToken = await admin.auth().verifyIdToken(authToken);
+       req.body.uid = decodedToken.uid;
       } else {
         throw new Error('Missing auth token');
       }
 
       // Check appcheck token
       if (appcheckToken) {
-        await admin.appCheck().verifyToken(appcheckToken);
+      await admin.appCheck().verifyToken(appcheckToken);
       } else {
         throw new Error('Missing appcheck token');
       }

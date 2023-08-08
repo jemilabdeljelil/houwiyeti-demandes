@@ -129,7 +129,7 @@ export class CacController {
             return new MessageDTO('errorCode', 8);
         }
 
-        if (!await this.cacService.demandeIsAuthorized(nniDemande, codeDemand)) {
+        if (!await this.cacService.demandeIsAuthorized(nniDemande, codeDemand,TypeDocumentDemande)) {
             const log = { deviceToken: demandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: demandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 9, uid: demandeTitreDTO.uid, endpoint: 'registerDemandeTitre', position: demandeGeoLocation,codeDemande:codeDemand ,comment:"Demande non autorisée" }
             try {
                 const createdLog = await this.LogeModel.create(log);
@@ -524,7 +524,7 @@ export class CacController {
             return new MessageDTO('errorCode', 8);
         }
 
-        if (! await this.cacService.demandeIsAuthorized(nniDemande, codeDemand)) {
+        if (! await this.cacService.demandeIsAuthorized(nniDemande, codeDemand,TypeDocumentDemande)) {
             const log = { deviceToken: updateDemandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: updateDemandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 9, uid: updateDemandeTitreDTO.uid, endpoint: 'updateDemandeTitre', position: demandeGeoLocation,codeDemande:codeDemand ,comment:"Demande non autorisée"}
             try {
                 const createdLog = await this.LogeModel.create(log);
