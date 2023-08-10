@@ -1,17 +1,18 @@
 import { IsArray, IsBase64, IsEnum, IsNotEmpty, IsObject, IsOptional, IsString, Validate, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 
 enum TypeDocumentDemande {
-  ID = 'ID',//Carte d’identité
-  NP = 'NP',//Passport normal
-  VP = 'VP',//Passport VIP
-  RC = 'RC',//Carte résident
+  ID = 'ID',
+  NP = 'NP',
+  VP = 'VP',
+  RC = 'RC',
 }
 
 enum CodeDemande {
-  PR = 'PR',//Première demande 1
-  RP = 'RP',//Remplacement  2
-  RN = 'RN',//Renouvellement  3
+  PR = 'PR',
+  RP = 'RP',
+  RN = 'RN',
 }
 
 enum Raison {
@@ -24,10 +25,11 @@ enum Raison {
 
 enum LivraisonType {
   CAC = 'CAC',
-  LAD = 'LAD',  //Livraison à domicile
+  LAD = 'LAD', 
 }
 
 class Coordinates {
+  @ApiProperty({ description: 'An array of two numbers: [longitude, latitude]' })
   @IsArray()
   @IsNotEmpty()
   @Type(() => Number)
@@ -43,10 +45,12 @@ class Coordinates {
 }
 
 class Location {
+  @ApiProperty({ description: 'The type of location (e.g., Point)' })
   @IsNotEmpty()
   @IsString()
   type: 'Point';
 
+  @ApiProperty({ type: Coordinates })
   @IsNotEmpty()
   @ValidateNested()
   @Type(() => Coordinates)
@@ -54,65 +58,83 @@ class Location {
 }
 
 class LivraisonDetailsDTO {
+  @ApiProperty({ enum: LivraisonType, enumName: 'LivraisonType' })
   @IsEnum(LivraisonType)
   livraisonType: LivraisonType;
 
+  @ApiProperty()
   @IsString()
   codeCac?: string;
 
+  @ApiProperty({ type: Location })
   @IsOptional()
   @IsObject()
   @ValidateNested()
+  @Type(() => Location)
   Location?: Location;
 
-
+  @ApiProperty()
   @IsString()
   livraisonPhoneNumber: string;
 
+  @ApiProperty()
   @IsOptional()
   @IsString()
   address?: string;
 
+  @ApiProperty()
   @IsOptional()
   @IsString()
   zipCode?: string;
 }
 
 export class DemandeTitreDTO {
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   uid: string;
 
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   deviceToken: string;
 
+  @ApiProperty({ enum: TypeDocumentDemande, enumName: 'TypeDocumentDemande' })
   @IsEnum(TypeDocumentDemande)
   typeDocumentDemande: TypeDocumentDemande;
 
+  @ApiProperty({ enum: CodeDemande, enumName: 'CodeDemande' })
   @IsEnum(CodeDemande)
   codeDemande: CodeDemande;
 
+  @ApiProperty({ enum: Raison, enumName: 'Raison' })
   @IsEnum(Raison)
   raison: Raison;
 
+  @ApiProperty()
   @IsArray()
   @IsNotEmpty()
   @IsBase64({ each: true })
   preuve: string[];
 
+  @ApiProperty()
   @IsNotEmpty()
   @IsBase64()
   photoIcao: string;
 
+  @ApiProperty({ type: LivraisonDetailsDTO })
   @IsObject()
   @ValidateNested()
+  @Type(() => LivraisonDetailsDTO)
   livraisonDetails: LivraisonDetailsDTO;
 
+  @ApiProperty({ type: Location })
   @IsObject()
   @ValidateNested()
+  @Type(() => Location)
   position: Location;
 
+  @ApiProperty()
   @IsString()
   nni: string;
 }

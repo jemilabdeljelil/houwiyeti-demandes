@@ -18,6 +18,7 @@ import { SequentialNumber } from './schemas/sequentialNumber.schema';
 import { ConfigService } from '@nestjs/config';
 import * as FormData from 'form-data';
 import * as crypto from 'crypto';
+import { NudInfoDTO } from './dto/nudInfo.dto';
 
 
 
@@ -473,7 +474,7 @@ export class CacService {
   }
 
   //get NUD info
-  async getNudInfo(nud: string): Promise<{ nud: string, nni: string, date_creation: Date, demandeStatus: number, commentaire: string }> {
+  async getNudInfo(nud: string): Promise<NudInfoDTO> {
 
 
     // find the corresponding nudSigpt

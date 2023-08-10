@@ -1,7 +1,9 @@
 import { IsArray, IsNotEmpty, IsObject, IsString, Validate, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 
 class Coordinates {
+  @ApiProperty({ description: 'An array of two numbers: [longitude, latitude]' })
   @IsArray()
   @IsNotEmpty()
   @Type(() => Number)
@@ -17,10 +19,12 @@ class Coordinates {
 }
 
 class Location {
+  @ApiProperty({ description: 'The type of location (e.g., Point)' })
   @IsNotEmpty()
   @IsString()
   type: 'Point';
 
+  @ApiProperty({ type: Coordinates })
   @IsNotEmpty()
   @ValidateNested()
   @Type(() => Coordinates)
@@ -28,14 +32,17 @@ class Location {
 }
 
 export class getLivraisonDetailsDTO {
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   uid: string;
 
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   deviceToken: string;
 
+  @ApiProperty({ type: Location })
   @IsNotEmpty()
   @IsObject()
   location: Location;

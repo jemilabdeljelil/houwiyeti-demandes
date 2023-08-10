@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 
 //import { ExpressAdapter } from '@nestjs/platform-express';
 import * as express from 'express';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 const NEST_LOGGING = true;
 async function bootstrap() {
@@ -32,6 +33,14 @@ async function bootstrap() {
   app.enableCors();
   app.use(express.json({ limit: '20mb' }));
   app.useGlobalPipes(new ValidationPipe());
+  const config = new DocumentBuilder()
+  .setTitle('Demandes')
+  .setDescription("API qui enregistre les demandes de titre et d'extrait pour les utilisateurs de la plateforme Houwiyeti")
+  .setVersion('1.0')
+  .addTag('cac')
+  .build();
+const document = SwaggerModule.createDocument(app, config);
+SwaggerModule.setup('api', app, document);
   await app.listen(configService.get<string>('API_PORT') || 3002);
 }
 bootstrap();
