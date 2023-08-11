@@ -3,7 +3,6 @@ import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
 class Coordinates {
-  @ApiProperty({ description: 'An array of two numbers: [longitude, latitude]' })
   @IsArray()
   @IsNotEmpty()
   @Type(() => Number)
@@ -19,12 +18,10 @@ class Coordinates {
 }
 
 class Location {
-  @ApiProperty({ description: 'The type of location (e.g., Point)' })
   @IsNotEmpty()
   @IsString()
   type: 'Point';
 
-  @ApiProperty({ type: Coordinates })
   @IsNotEmpty()
   @ValidateNested()
   @Type(() => Coordinates)

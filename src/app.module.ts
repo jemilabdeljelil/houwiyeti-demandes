@@ -10,7 +10,7 @@ import { CacModule } from './cac/cac.module';
     envFilePath: '.env',
     isGlobal: true,
   }),
-  MongooseModule.forRoot(`mongodb://anrpts_houwiyeti_user:hgTR125TFRG265POI@mongo1:30001,mongo2:30002,mongo3:30003/anrpts?replicaSet=rs0&authSource=admin`,
+  MongooseModule.forRoot(process.env.DB_URl,
     {
       dbName: 'anrpts', // Set the database name
       authSource: 'admin',// Specify the authentication source database

@@ -3,16 +3,16 @@ import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
 enum TypeDocumentDemande {
-  ID = 'ID',
-  NP = 'NP',
-  VP = 'VP',
-  RC = 'RC',
+  ID = 'ID',//Carte d’identité
+  NP = 'NP',//Passport normal
+  VP = 'VP',//Passport VIP
+  RC = 'RC',//Carte résident
 }
 
 enum CodeDemande {
-  PR = 'PR',
-  RP = 'RP',
-  RN = 'RN',
+  PR = 'PR',//Première demande 1
+  RP = 'RP',//Remplacement  2
+  RN = 'RN',//Renouvellement  3
 }
 
 enum Raison {
@@ -25,11 +25,10 @@ enum Raison {
 
 enum LivraisonType {
   CAC = 'CAC',
-  LAD = 'LAD', 
+  LAD = 'LAD',  //Livraison à domicile
 }
 
 class Coordinates {
-  @ApiProperty({ description: 'An array of two numbers: [longitude, latitude]' })
   @IsArray()
   @IsNotEmpty()
   @Type(() => Number)
@@ -45,12 +44,10 @@ class Coordinates {
 }
 
 class Location {
-  @ApiProperty({ description: 'The type of location (e.g., Point)' })
   @IsNotEmpty()
   @IsString()
   type: 'Point';
 
-  @ApiProperty({ type: Coordinates })
   @IsNotEmpty()
   @ValidateNested()
   @Type(() => Coordinates)
@@ -58,31 +55,25 @@ class Location {
 }
 
 class LivraisonDetailsDTO {
-  @ApiProperty({ enum: LivraisonType, enumName: 'LivraisonType' })
   @IsEnum(LivraisonType)
   livraisonType: LivraisonType;
 
-  @ApiProperty()
   @IsString()
   codeCac?: string;
 
-  @ApiProperty({ type: Location })
   @IsOptional()
   @IsObject()
   @ValidateNested()
-  @Type(() => Location)
   Location?: Location;
 
-  @ApiProperty()
+
   @IsString()
   livraisonPhoneNumber: string;
 
-  @ApiProperty()
   @IsOptional()
   @IsString()
   address?: string;
 
-  @ApiProperty()
   @IsOptional()
   @IsString()
   zipCode?: string;
@@ -98,16 +89,16 @@ export class DemandeTitreDTO {
   @IsNotEmpty()
   @IsString()
   deviceToken: string;
-
-  @ApiProperty({ enum: TypeDocumentDemande, enumName: 'TypeDocumentDemande' })
+  
+  @ApiProperty()
   @IsEnum(TypeDocumentDemande)
   typeDocumentDemande: TypeDocumentDemande;
 
-  @ApiProperty({ enum: CodeDemande, enumName: 'CodeDemande' })
+  @ApiProperty()
   @IsEnum(CodeDemande)
   codeDemande: CodeDemande;
 
-  @ApiProperty({ enum: Raison, enumName: 'Raison' })
+  @ApiProperty()
   @IsEnum(Raison)
   raison: Raison;
 
@@ -122,16 +113,14 @@ export class DemandeTitreDTO {
   @IsBase64()
   photoIcao: string;
 
-  @ApiProperty({ type: LivraisonDetailsDTO })
+  @ApiProperty()
   @IsObject()
   @ValidateNested()
-  @Type(() => LivraisonDetailsDTO)
   livraisonDetails: LivraisonDetailsDTO;
 
-  @ApiProperty({ type: Location })
+  @ApiProperty()
   @IsObject()
   @ValidateNested()
-  @Type(() => Location)
   position: Location;
 
   @ApiProperty()
