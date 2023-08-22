@@ -23,6 +23,7 @@ import { NudInfoDTO } from './dto/nudInfo.dto';
 
 
 
+
 interface OpenCvResult {
   code: string;
   match: boolean;
@@ -60,6 +61,7 @@ export class CacService {
     @InjectModel(LivraisonDetails.name) private LivraisonDetailsModel: mongoose.Model<LivraisonDetails>,
     @InjectModel(AuthorizedNni.name) private AuthorizedNniModel: mongoose.Model<AuthorizedNni>,
     @InjectModel(SequentialNumber.name) private SequentialNumberModel: mongoose.Model<SequentialNumber>,
+    
     private configService: ConfigService,
     //private httpService: HttpService
   ) { }
@@ -204,7 +206,7 @@ export class CacService {
     return true;
   }
 
-  // le nni et la demande sont autorisé
+  // le nni et la demande est autorisé
   async IsNniAuthorized(nniMaster: string, nniSlave: string, flag: string): Promise<boolean> {
     // check if nniMaster exists in the authorizedNni collection
     const authorizedNni = await this.AuthorizedNniModel.findOne({ nni: nniMaster });
@@ -521,7 +523,7 @@ export class CacService {
 
       console.log('Image set successfully:', response.data);
     } catch (error) {
-      console.error('Error setting image:', error.response.data);
+      console.error('Error setting image:', error);
     }
   }
   //get binery image from http url
@@ -533,7 +535,7 @@ export class CacService {
       return Buffer.from(response.data, 'binary');
 
     } catch (error) {
-      console.error('Error geting image:', error.response.data);
+      console.error('Error geting image:', error);
     }
   }
 

@@ -103,10 +103,10 @@ export class DemandeTitreDTO {
   raison: Raison;
 
   @ApiProperty()
+  @IsOptional()
   @IsArray()
-  @IsNotEmpty()
   @IsBase64({ each: true })
-  preuve: string[];
+  preuve?: string[];
 
   @ApiProperty()
   @IsNotEmpty()

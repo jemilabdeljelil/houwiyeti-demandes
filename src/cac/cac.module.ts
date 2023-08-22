@@ -13,12 +13,13 @@ import { LogSchema } from './schemas/logs.schema';
 import { NudSigptSchema } from './schemas/nudSigpts.schema';
 import { ParamsSchema } from './schemas/params.schema';
 import { PersonneSchema } from './schemas/personnes.schemas';
+import { ReclamationSchema } from './schemas/reclamations.schemas';
 import { SequentialNumberSchema } from './schemas/sequentialNumber.schema';
 import { TitreSchema } from './schemas/titres.schema';
 import { UserSchema } from './schemas/users.schemas';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: 'Params', schema: ParamsSchema }, { name: 'Personne', schema: PersonneSchema }, { name: 'User', schema: UserSchema }, { name: 'Device', schema: DeviceSchema }, { name: 'Log', schema: LogSchema },{ name: 'Titre', schema: TitreSchema },{ name: 'NudSigpt', schema: NudSigptSchema },{ name: 'DemandeTitre', schema: DemandeTitreSchema },{ name: 'DemandeExtrait', schema: DemandeExtraitSchema },{ name: 'Cac', schema: CacSchema },{ name: 'LivraisonDetails', schema: LivraisonDetailsSchema },{ name: 'AuthorizedNni', schema: AuthorizedNniSchema },{ name: 'SequentialNumber', schema: SequentialNumberSchema }])],
+  imports: [MongooseModule.forFeature([{ name: 'Params', schema: ParamsSchema }, { name: 'Personne', schema: PersonneSchema }, { name: 'User', schema: UserSchema }, { name: 'Device', schema: DeviceSchema }, { name: 'Log', schema: LogSchema },{ name: 'Titre', schema: TitreSchema },{ name: 'NudSigpt', schema: NudSigptSchema },{ name: 'DemandeTitre', schema: DemandeTitreSchema },{ name: 'DemandeExtrait', schema: DemandeExtraitSchema },{ name: 'Cac', schema: CacSchema },{ name: 'LivraisonDetails', schema: LivraisonDetailsSchema },{ name: 'AuthorizedNni', schema: AuthorizedNniSchema },{ name: 'SequentialNumber', schema: SequentialNumberSchema },{ name: 'Reclamation', schema: ReclamationSchema }])],
   controllers: [CacController],
   providers: [CacService]
 })

@@ -96,10 +96,10 @@ export class UpdateDemandeTitreDTO {
   raison: Raison;
 
   @ApiProperty()
+  @IsOptional()
   @IsArray()
-  @IsNotEmpty()
-  @IsBase64()
-  preuve: string[];
+  @IsBase64({ each: true })
+  preuve?: string[];
 
   @ApiProperty()
   @IsNotEmpty()

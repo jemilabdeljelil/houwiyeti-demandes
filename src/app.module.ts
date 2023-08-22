@@ -27,4 +27,4 @@ export class AppModule { }
 //`mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@102.216.219.44:27017/${process.env.DB_NAME}`    internet
 //`mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`
 //process.env.DB_URl_local
-//`mongodb://anrpts_houwiyeti_user:hgTR125TFRG265POI@mongo1:30001,mongo2:30002,mongo3:30003/anrpts?replicaSet=rs0&authSource=admin`
+//process.env.DB_URl,

@@ -24,37 +24,54 @@ import { DemandeStatusRepDTO } from './dto/demandeStatusReponse.dto';
 import { UpdateDemandeRepDTO } from './dto/updateDemandeReponse.dto';
 import { DemandeExtraitRepDTO } from './dto/demadeExtraitReponse.dto';
 import { NudInfoDTO } from './dto/nudInfo.dto';
+import { ReclamationDTO } from './dto/reclamation.dto';
+import { Reclamation } from './schemas/reclamations.schemas';
 
 
 
 @ApiHeader({
     name: 'authToken',
     description: 'firebse auth token',
-  })
-  @ApiHeader({
+})
+@ApiHeader({
     name: 'appcheckToken',
-    description: 'firebse appcheckToken token',   
-  })
-  @ApiHeader({
+    description: 'firebse appcheckToken token',
+})
+@ApiHeader({
     name: 'deviceToken',
-    description: 'user device token',    
-  })
-  @ApiHeader({
+    description: 'user device token',
+})
+@ApiHeader({
     name: 'appversion',
-    description: 'user application version',    
-  })
+    description: 'user application version',
+})
 @ApiTags('cac')
 @Controller('cac')
 export class CacController {
+    private photosDemandsPath: string;
+    private photosSigptsPath: string;
+    private piecesPath: string;
+    private paramsMap: Map<string, string> = new Map<string, string>();
+
     constructor(private cacService: CacService,
-        @InjectModel(Log.name) private LogeModel: mongoose.Model<Log>, @InjectModel(DemandeTitre.name) private DemandeTitreModel: mongoose.Model<DemandeTitre>,
+        @InjectModel(Log.name) private LogeModel: mongoose.Model<Log>,
+        @InjectModel(DemandeTitre.name) private DemandeTitreModel: mongoose.Model<DemandeTitre>,
         @InjectModel(DemandeExtrait.name) private DemandeExtraitModel: mongoose.Model<DemandeExtrait>,
         @InjectModel(NudSigpt.name) private NudSigptModel: mongoose.Model<NudSigpt>,
-    ) { }
+        @InjectModel(Reclamation.name) private ReclamationModel: mongoose.Model<Reclamation>,
 
 
+    ) {
+        this.initializePaths();
+    }
 
 
+    private async initializePaths() {
+        this.paramsMap = await this.cacService.getParams();
+        this.photosDemandsPath = this.paramsMap.get('PHOTOS_DEMANDES_PATH');
+        this.photosSigptsPath = this.paramsMap.get('PHOTOS_SIGPTS_PATH');
+        this.piecesPath = this.paramsMap.get('PIECES_PATH');
+    }
 
     @Post('getCacs')
     @ApiCreatedResponse({
@@ -71,6 +88,10 @@ export class CacController {
         const latitude = cacDTO.location.coordinates[1];
 
         const cacsNearby = await this.cacService.getCacsNearby(longitude, latitude);
+        const log = { longitude: longitude, latitude: latitude, dateTime: new Date(), successCode: 0, endpoint: 'getCacs', }
+
+        console.log('Log getCac:', log);
+
 
         return cacsNearby;
     }
@@ -92,6 +113,7 @@ export class CacController {
     async getLivresonDeteals(@Body() livraisonDetailsDTO: getLivraisonDetailsDTO): Promise<DeliveryDetailsDTO | MessageDTO> {
         const errors = await validate(livraisonDetailsDTO);
         if (errors.length > 0) {
+            console.log('Error payload validation:', errors);
             throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
         }
 
@@ -126,16 +148,14 @@ export class CacController {
         description: 'Demande créée avec succès',
         type: MessageDTO,
     })
-    async registerDemandeTitre(@Body() demandeTitreDTO: DemandeTitreDTO): Promise<MessageDTO |RegistreDemendResDTO> {
+    async registerDemandeTitre(@Body() demandeTitreDTO: DemandeTitreDTO): Promise<MessageDTO | RegistreDemendResDTO> {
 
         const errors = await validate(demandeTitreDTO);
         if (errors.length > 0) {
+            console.log('Error payload validation:', errors);
             throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
         }
-        const paramsMap = await this.cacService.getParams();
-        const photosDemandsPath = paramsMap.get('PHOTOS_DEMANDES_PATH');
-        const photosSigptsPath = paramsMap.get('PHOTOS_SIGPTS_PATH');
-        const piecesPath = paramsMap.get('PIECES_PATH');
+
         const preuvPieces = demandeTitreDTO.preuve;
         const nniMaster = await this.cacService.getNniByUid(demandeTitreDTO.uid);
         const nniDemande = demandeTitreDTO.nni;
@@ -215,7 +235,7 @@ export class CacController {
         // Write the photoIcao to a file
         const photoIcaoName = `${hashedNni}_${new Date().toISOString()}.jpg`;
         try {
-            await this.cacService.setImage(photoIcao, photoIcaoName, photosDemandsPath);
+            await this.cacService.setImage(photoIcao, photoIcaoName, this.photosDemandsPath);
         } catch (error) {
             console.error('Error  writing file:', error);
             const log = {
@@ -252,7 +272,7 @@ export class CacController {
 
                     //  write it to the file
 
-                    await this.cacService.setImage(preuvPieces[i], fileName, piecesPath);
+                    await this.cacService.setImage(preuvPieces[i], fileName, this.piecesPath);
                     piecesNames.push(fileName);
                 } catch (error) {
                     // Handle any errors that occur during file writing
@@ -292,7 +312,7 @@ export class CacController {
         let photoSig;
         try {
 
-            photoSig = await this.cacService.getBinaryImage(photoSigName, photosSigptsPath);
+            photoSig = await this.cacService.getBinaryImage(photoSigName, this.photosSigptsPath);
         } catch (error) {
             const log = {
                 deviceToken: demandeTitreDTO.deviceToken,
@@ -329,7 +349,7 @@ export class CacController {
         let opencvScore = 0;
         const comparefaceMatch = await this.cacService.callComparefaceAPI(photoIcaoData, photoSig);
         if (comparefaceMatch) {
-            if (comparefaceMatch.similarity > parseFloat(paramsMap.get('MATCH_ACCEPTED_SCORE'))) {
+            if (comparefaceMatch.similarity > parseFloat(this.paramsMap.get('MATCH_ACCEPTED_SCORE'))) {
                 comparefacResult = true;
             }
             comparefaceScore = comparefaceMatch.similarity * 100;
@@ -337,7 +357,7 @@ export class CacController {
 
         const openCvMatch = await this.cacService.callOpenCvAPI(photoIcaoData, photoSig);
         if (openCvMatch) {
-            if (openCvMatch.distance < parseFloat(paramsMap.get('OPENCV_MAX_DISTANCE'))) {
+            if (openCvMatch.distance < parseFloat(this.paramsMap.get('OPENCV_MAX_DISTANCE'))) {
                 OpenCvResult = true;
             }
 
@@ -429,7 +449,7 @@ export class CacController {
                 newDemande._id
             );
 
-              return registreDemendResDTO;
+            return registreDemendResDTO;
 
 
         } catch (error) {
@@ -463,6 +483,7 @@ export class CacController {
     async checkDemande(@Body() checkDemandeDTO: CheckDemandeDTO): Promise<MessageDTO | DemandeStatusRepDTO> {
         const errors = await validate(checkDemandeDTO);
         if (errors.length > 0) {
+            console.log('Error payload validation:', errors);
             throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
         }
         const uid = checkDemandeDTO.uid;
@@ -492,7 +513,7 @@ export class CacController {
         }
         const response = new DemandeStatusRepDTO(demandeStatus.demandeStatus, 3, demandeStatus.commentaire);
 
-        return response ;
+        return response;
     }
 
 
@@ -510,15 +531,13 @@ export class CacController {
         description: 'La demande est mise à jour avec succès',
         type: UpdateDemandeRepDTO,
     })
-    async updateDemandeTitre(@Body() updateDemandeTitreDTO: UpdateDemandeTitreDTO): Promise<MessageDTO |UpdateDemandeRepDTO> {
+    async updateDemandeTitre(@Body() updateDemandeTitreDTO: UpdateDemandeTitreDTO): Promise<MessageDTO | UpdateDemandeRepDTO> {
         const errors = await validate(updateDemandeTitreDTO);
         if (errors.length > 0) {
+            console.log('Error payload validation:', errors);
             throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
         }
-        const paramsMap = await this.cacService.getParams();
-        const photosDemandsPath = paramsMap.get('PHOTOS_DEMANDES_PATH');
-        const photosSigptsPath = paramsMap.get('PHOTOS_SIGPTS_PATH');
-        const piecesPath = paramsMap.get('PIECES_PATH');
+
         const demandeId = updateDemandeTitreDTO.demandeId;
         const updatedDemande = await this.cacService.getDemandeByid(demandeId);
         const preuvPieces = updateDemandeTitreDTO.preuve;
@@ -539,7 +558,7 @@ export class CacController {
         // Write the photoIcao to a file
         const photoIcaoName = `${hashedNni}_${new Date().toISOString()}.jpg`;
         try {
-            await this.cacService.setImage(photoIcao, photoIcaoName, photosDemandsPath);
+            await this.cacService.setImage(photoIcao, photoIcaoName, this.photosDemandsPath);
         } catch (error) {
             console.error('Error  writing file:', error);
             const log = { deviceToken: updateDemandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: updateDemandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 6, uid: updateDemandeTitreDTO.uid, endpoint: 'updateDemandeTitre', position: demandeGeoLocation, comment: "Erreur lord de seting imageIcao" }
@@ -554,23 +573,23 @@ export class CacController {
         }
 
         const piecesNames = [];//les noms despieces envoyés avec la demandes
+        if (preuvPieces) {
+            for (let i = 0; i < preuvPieces.length; i++) {
+                try {
+                    // Generate a unique filename
+                    const fileName = `${hashedNni}_${new Date().toISOString()}_${i}.jpg`;
 
-        for (let i = 0; i < preuvPieces.length; i++) {
-            try {
-                // Generate a unique filename
-                const fileName = `${hashedNni}_${new Date().toISOString()}_${i}.jpg`;
+                    // Decode the base64 string and write it to the file
 
-                // Decode the base64 string and write it to the file
+                    await this.cacService.setImage(preuvPieces[i], fileName, this.piecesPath);
+                    piecesNames.push(fileName);
 
-                await this.cacService.setImage(preuvPieces[i], fileName, piecesPath);
-                piecesNames.push(fileName);
-
-            } catch (error) {
-                // Handle any errors that occur during file writing
-                console.error(`Error writing preuvPiece ${i} to file: ${error}`);
+                } catch (error) {
+                    // Handle any errors that occur during file writing
+                    console.error(`Error writing preuvPiece ${i} to file: ${error}`);
+                }
             }
         }
-
         if (this.cacService.existDemendeEncours(nniDemande, TypeDocumentDemande)) {
             const log = { deviceToken: updateDemandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: updateDemandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 9, uid: updateDemandeTitreDTO.uid, endpoint: 'updateDemandeTitre', position: demandeGeoLocation, comment: "Il y a une demande pour le même type en cours" }
             try {
@@ -636,7 +655,7 @@ export class CacController {
         let photoSig;
         try {
             // photoSig = fs.readFile(photoSigPath);
-            photoSig = await this.cacService.getBinaryImage(photoSigName, photosSigptsPath);
+            photoSig = await this.cacService.getBinaryImage(photoSigName, this.photosSigptsPath);
         } catch (error) {
             const log = { deviceToken: updateDemandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: updateDemandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), errorCode: 6, uid: updateDemandeTitreDTO.uid, endpoint: 'updateDemandeTitre', position: demandeGeoLocation, comment: "Erreur l'ord de la recuperation de l'image sigpts " }
             try {
@@ -719,7 +738,7 @@ export class CacController {
             });
             await session.commitTransaction();
             session.endSession();
-          //  const retour = { demandeStatus: 1, successCode: 2, livresonPin: livraisonPin, NUD: nud };
+            //  const retour = { demandeStatus: 1, successCode: 2, livresonPin: livraisonPin, NUD: nud };
             const log = { deviceToken: updateDemandeTitreDTO.deviceToken, nni: nniDemande, phoneNumber: updateDemandeTitreDTO.livraisonDetails.livraisonPhoneNumber, dateTime: new Date(), successCode: 2, uid: updateDemandeTitreDTO.uid, endpoint: 'updateDemandeTitre', position: demandeGeoLocation, nudId: newNud._id, comment: "Demande enregistrée avec succès ", comparefaceMatch: JSON.stringify(comparefaceMatch), openCvMatch: JSON.stringify(openCvMatch) }
             try {
                 const createdLog = await this.LogeModel.create(log);
@@ -764,6 +783,7 @@ export class CacController {
     async registerDemandeExtraits(@Body() demandeExtraitsDTO: DemandeExtraitsDTO): Promise<MessageDTO | DemandeExtraitRepDTO> {
         const errors = await validate(demandeExtraitsDTO);
         if (errors.length > 0) {
+            console.log('Error payload validation:', errors);
             throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
         }
         const nniMaster = await this.cacService.getNniByUid(demandeExtraitsDTO.uid);
@@ -876,6 +896,7 @@ export class CacController {
     async suiviNud(@Body() suiviNudDTO: SuiviNudDTO): Promise<MessageDTO | NudInfoDTO> {
         const errors = await validate(suiviNudDTO);
         if (errors.length > 0) {
+            console.log('Error payload validation:', errors);
             throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
         }
         const uid = suiviNudDTO.uid;
@@ -903,7 +924,7 @@ export class CacController {
         } catch (error) {
             console.error('Error creating log:', error);
         }
-    
+
 
         return nudInfo;
     }
@@ -916,6 +937,7 @@ export class CacController {
     async annulerDemande(@Body() annlerDemandeDTO: AnnulerDemandeDTO): Promise<MessageDTO> {
         const errors = await validate(annlerDemandeDTO);
         if (errors.length > 0) {
+            console.log('Error payload validation:', errors);
             throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
         }
         const uid = annlerDemandeDTO.uid;
@@ -948,6 +970,108 @@ export class CacController {
             console.error('Error creating log:', error);
         }
         return new MessageDTO('errorCode', 20);
+    }
+
+
+
+
+
+    @Post('enregistrerReclamation')
+    @ApiResponse({
+        description: 'The response of enregistrerReclamation endpoint.',
+        type: MessageDTO,
+    })
+    async enregistrerReclamation(@Body() reclamationDTO: ReclamationDTO): Promise<MessageDTO> {
+        const errors = await validate(reclamationDTO);
+        if (errors.length > 0) {
+            console.log('Error payload validation:', errors);
+            throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
+        }
+        const uid = reclamationDTO.uid;
+        const deviceToken = reclamationDTO.deviceToken;
+        const nni = await this.cacService.getNniByUid(uid);
+        const hashedNni = await this.cacService.hashNni(nni)
+        const preuve = reclamationDTO.preuve;
+
+        // Write the reclamation_piece to a file
+        let preuveName;
+        if (preuve) {
+            preuveName = `${hashedNni}_${new Date().toISOString()}.jpg`;
+            try {
+                await this.cacService.setImage(preuve, preuveName, this.piecesPath);
+            } catch (error) {
+                console.error('Error  writing file:', error);
+                const log = {
+                    deviceToken: deviceToken,
+                    nni: nni,
+
+                    dateTime: new Date(),
+                    errorCode: 6,
+                    uid: uid,
+                    operation: "write_reclamation_piece",
+                    endpoint: 'enregistrerReclamation',
+                    comment: "Erreur lord de seting reclamation_piece"
+                };
+                try {
+                    const createdLog = await this.LogeModel.create(log);
+                    console.log('Log created:', createdLog);
+                } catch (error) {
+                    console.error('Error creating log:', error);
+                }
+
+                return new MessageDTO('errorCode', 6); // Photoicao not saved
+
+
+            }
+
+        }
+        //enregistrer la nouvell demande
+        const session = await this.ReclamationModel.startSession();
+        session.startTransaction();
+        try {
+            await this.ReclamationModel.create({
+                nni: nni,
+                deviceToken: reclamationDTO.deviceToken,
+                phoneNumber: reclamationDTO.phoneNumber,
+                description: reclamationDTO.description,
+                preuvePieceName: preuveName,
+                piecesDirectory: this.piecesPath
+
+
+            })
+
+            await session.commitTransaction();
+            session.endSession();
+            const log = { deviceToken: deviceToken, dateTime: new Date(), successCode: 6, uid: uid, endpoint: 'enregistrerReclamation' }
+            try {
+                const createdLog = await this.LogeModel.create(log);
+                console.log('Log created:', createdLog);
+            } catch (error) {
+                console.error('Error creating log:', error);
+            }
+
+
+
+            return new MessageDTO('successCode', 6);
+
+        } catch (error) {
+
+            const log = { deviceToken: deviceToken, dateTime: new Date(), errorCode: 21, uid: uid, endpoint: 'enregistrerReclamation' }
+            try {
+                const createdLog = await this.LogeModel.create(log);
+                console.log('Log created:', createdLog);
+            } catch (error) {
+                console.error('Error creating log:', error);
+            }
+            return new MessageDTO('errorCode', 21);
+
+        }
+
+
+
+
+
+
     }
 
 }
