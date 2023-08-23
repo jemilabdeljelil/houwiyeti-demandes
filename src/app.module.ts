@@ -7,13 +7,14 @@ import { CacModule } from './cac/cac.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
-    envFilePath: '.env',
+    //envFilePath: process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.dev',
+    //envFilePath: '.env.dev',
+    envFilePath: '.env.prod',
     isGlobal: true,
   }),
-  MongooseModule.forRoot(process.env.DB_URl,
+  MongooseModule.forRoot(process.env.DB_URL,
     {
       dbName: 'anrpts', // Set the database name
-      authSource: 'admin',// Specify the authentication source database
       authMechanism: 'SCRAM-SHA-256', // Set the authentication mechanism to SCRAM-SHA-256
     },
   ),
@@ -24,7 +25,6 @@ import { CacModule } from './cac/cac.module';
 export class AppModule { }
 
 
-//`mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@102.216.219.44:27017/${process.env.DB_NAME}`    internet
-//`mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`
-//process.env.DB_URl_local
-//process.env.DB_URl,
+
+
+
